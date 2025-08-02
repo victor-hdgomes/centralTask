@@ -131,7 +131,7 @@ const removeTodo = async (todo) => {
 
 		<TodoList :todos="todos" @remove="removeTodo" @edit="editExistingTodo" />
 
-		<div class="pagination">
+		<div v-if="todos.length" class="pagination">
 			<button @click="goPrevious" :disabled="pageNumber === 0">Previous</button>
 			<span>Page {{ pageNumber + 1 }} of {{ totalPages }}</span>
 			<button @click="goNext" :disabled="pageNumber >= totalPages - 1">Next</button>

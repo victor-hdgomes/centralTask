@@ -1,27 +1,36 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch } from 'vue'
+import { useUserStore } from '../stores/user'
 
 const props = defineProps({
     editTodo: {
         type: Object,
         default: null
+    },
+    users: {
+        type: Array,
+        required: true
     }
 })
 
 const emit = defineEmits(['add', 'update'])
+
+const userStore = useUserStore()
 
 const showForm = ref(false)
 const input_title = ref('')
 const input_description = ref('')
 const input_dueDate = ref('')
 const input_status = ref(0)
+const input_userId = ref(userStore.user.userId || '')
 
 watch(() => props.editTodo, (newVal) => {
     if (newVal) {
         input_title.value = newVal.title
         input_description.value = newVal.description
-        input_dueDate.value = newVal.dueDate
+        input_dueDate.value = new Date(newVal.dueDate).toISOString().split('T')[0]
         input_status.value = newVal.status
+        input_userId.value = newVal.userId || userStore.user.userId || ''
         showForm.value = true
     }
 })
@@ -50,8 +59,8 @@ const saveTodo = () => {
         title: input_title.value,
         description: input_description.value,
         dueDate: input_dueDate.value,
-        status: input_status.value,
-        userId: 'b4a76217-44e2-4f11-81ad-7c7a3b59f9ae'
+        userId: input_userId.value,
+        status: input_status.value
     }
 
     if (props.editTodo) {
@@ -71,12 +80,12 @@ const saveTodo = () => {
             Add New Todo
         </button>
 
-        <div v-if="showForm" class="modal-overlay" @click.self="{ toggleForm(); resetForm(); editTodo = null }">
+        <div v-if="showForm" class="modal-overlay">
             <div class="modal-content">
                 <div class="header-row">
-                    <h3>{{ props.editTodo ? 'Edit Todo' : 'Create a todo' }}</h3>
+                    <h3></h3>
 
-                    <button @click="{ toggleForm(); resetForm(); editTodo = null }" class="toggle-button">
+                    <button @click="{ toggleForm(); resetForm(); }" class="toggle-button">
                         Close
                     </button>
                 </div>
@@ -103,9 +112,19 @@ const saveTodo = () => {
                                 <option :value="2">Completed</option>
                             </select>
                         </div>
+
+                        <div class="input-group">
+                            <h4>User</h4>
+                            <select :disabled="!props.editTodo" v-model="input_userId" required>
+                                <option disabled value="">Select a user</option>
+                                <option v-for="user in users" :key="user.id" :value="user.id">
+                                    {{ user.nome }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
-                    <input type="submit" :value="props.editTodo ? 'Update Todo' : 'Add Todo'" />
+                    <input type="submit" value="Submit" />
                 </form>
             </div>
         </div>

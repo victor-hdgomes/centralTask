@@ -66,7 +66,3 @@
 .login button:hover {
   opacity: 0.75;
 }
-
-.login .error-message {
-  color: red;
-}

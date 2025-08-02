@@ -1,8 +1,7 @@
 <template>
     <section class="greeting">
         <h2 class="title">
-            What's up, <input type="text" id="name" placeholder="Name here" :value="modelValue"
-                @input="$emit('update:modelValue', $event.target.value)" />
+            What's up, <span class="name">{{ pascalCaseName }}</span>!
         </h2>
 
         <button @click="logout" class="logout-button">Logout</button>
@@ -10,17 +9,23 @@
 </template>
 
 <script setup>
-defineProps({
-    modelValue: {
-        type: String,
-        required: true
-    }
+import { computed } from 'vue'
+import { useRouter } from 'vue-router';
+import { useUserStore } from '../stores/user';
+
+const userStore = useUserStore()
+const router = useRouter()
+
+const pascalCaseName = computed(() => {
+    if (!userStore.user?.name) return ''
+    return userStore.user.name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ')
 })
 
-const emit = defineEmits(['update:modelValue', 'logout']);
-
 const logout = () => {
-    emit('logout')
+    userStore.logout(router)
 }
 </script>
 
@@ -36,17 +41,18 @@ const logout = () => {
     display: flex;
 }
 
-.greeting .title input {
-    margin-left: 0.5rem;
-    flex: 1 1 0%;
-    min-width: 0;
-}
-
 .greeting .title,
-.greeting .title input {
+.greeting .title .name {
     color: var(--dark);
     font-size: 1.5rem;
     font-weight: 700;
+}
+
+.greeting .title .name {
+    margin: 0 0.5rem;
+    flex: 1 1 0%;
+    min-width: 0;
+    color: var(--personal);
 }
 
 .logout-button {

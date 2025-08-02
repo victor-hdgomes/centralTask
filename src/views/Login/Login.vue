@@ -1,50 +1,18 @@
 <script setup>
 import { ref } from 'vue'
+import { useUserStore } from '../../stores/user'
 import { useRouter } from 'vue-router'
-import { useToast } from 'vue-toastification'
 
-const toast = useToast()
-const router = useRouter()
-
+const userStore = useUserStore()
 const email = ref('')
 const password = ref('')
 
+const router = useRouter()
+
 const loading = ref(false)
-const error = ref(null)
 
 async function login() {
-    error.value = null
-
-    if (!email.value || !password.value) {
-        error.value = 'Please fill in email and password.'
-        return
-    }
-
-    loading.value = true
-
-    try {
-        await fakeLogin(email.value, password.value)
-
-        toast.success('Login successful!')
-
-        router.push('/dashboard')
-    } catch (err) {
-        error.value = 'Invalid credentials.'
-    } finally {
-        loading.value = false
-    }
-}
-
-function fakeLogin(email, password) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (email === 'email@example.com' && password === '123456') {
-                resolve()
-            } else {
-                reject()
-            }
-        }, 1000)
-    })
+    await userStore.login(email.value, password.value, router)
 }
 </script>
 
@@ -57,8 +25,6 @@ function fakeLogin(email, password) {
 
             <label for="password">password</label>
             <input id="password" type="password" v-model="password" placeholder="Your password" required />
-
-            <p v-if="error" class="error-message">{{ error }}</p>
 
             <button type="submit" :disabled="loading">{{ loading ? 'Logging in...' : 'Log in' }}</button>
         </form>

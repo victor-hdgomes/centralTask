@@ -17,8 +17,8 @@ const todos_asc = computed(() => {
 })
 
 const statusMap = {
-    0: 'Pending',
-    1: 'InProgress',
+    0: 'Not Started',
+    1: 'In Progress',
     2: 'Completed'
 }
 </script>
@@ -28,21 +28,19 @@ const statusMap = {
         <h3>TODO LIST</h3>
 
         <div class="list" id="todo-list">
-            <div v-for="(todo, index) in todos_asc" :key="index" :class="`todo-item ${todo.status === 2 ? 'done' : ''}`"
+            <div v-for="todo in todos_asc" :key="todo.id" :class="`todo-item ${todo.status === 2 ? 'done' : ''}`"
                 @click="emit('edit', todo)">
-                <label>
-                    <span class="bubble" :class="todo.status === 2 ? 'business' : 'personal'"></span>
-                </label>
-
                 <div class="todo-content">
                     <p class="todo-info">{{ todo.title }}</p>
-
-                    <p class="todo-info">{{ statusMap[todo.status] || 'Unknown' }}</p>
                 </div>
 
                 <div class="actions">
+                    <p class="todo-status" :class="`status-${todo.status}`">
+                        {{ statusMap[todo.status] || 'Unknown' }}
+                    </p>
+
                     <p class="todo-date">
-                        {{ todo.dueDate }}
+                        {{ new Date(todo.dueDate).toLocaleDateString('pt-BR') }}
                     </p>
 
                     <button class="delete" @click.stop="$emit('remove', todo)">Delete</button>
@@ -79,7 +77,7 @@ const statusMap = {
 }
 
 .todo-item .todo-content {
-    flex: 1 1 0%;
+    flex: 1;
     display: flex;
     flex-direction: row;
     gap: 1rem;
@@ -87,7 +85,6 @@ const statusMap = {
 }
 
 .todo-info {
-    flex: 2;
     color: var(--dark);
     font-size: 1.125rem;
 }
@@ -125,6 +122,29 @@ const statusMap = {
     justify-content: center;
     align-items: center;
     height: 150px;
+}
+
+.todo-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: white;
+    user-select: none;
+    width: fit-content;
+    background-color: #f0ad4e;
+}
+
+.status-0 {
+    background-color: #f0ad4e;
+}
+
+.status-1 {
+    background-color: #0275d8;
+}
+
+.status-2 {
+    background-color: #5cb85c;
 }
 
 @media (max-width: 790px) {

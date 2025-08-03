@@ -1,5 +1,8 @@
 <template>
+  <NotificationListener />
   <router-view />
 </template>
 
-<script setup></script>
+<script setup>
+import NotificationListener from './components/NotificationListener.vue';
+</script>
